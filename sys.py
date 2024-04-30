@@ -6,28 +6,10 @@ import pickle
 import config 
 import unidecode, ast
 
-# Top-N recomendations order by score
-# Top-N recommendations order by score
-def get_recommendations(N, scores, cuisine):
-    # load in recipe dataset 
-    df_recipes = pd.read_csv('store\df_recipes_parsed.csv')
-    
-    # Filter recipes by cuisine
-    df_recipes = df_recipes[df_recipes['cuisine'] == cuisine]
-    
+def get_recommendations(N, scores, cuisine,df_recipes):
     # order the scores with and filter to get the highest N scores
-    top = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:N]
-    
-    # create dataframe to load in recommendations 
-    recommendation = pd.DataFrame(columns=['recipe', 'ingredients', 'score', 'url'])
-    count = 0
-    for i in top:
-        recommendation.at[count, 'recipe'] = df_recipes['recipe_name'][i]  # Use original recipe name
-        recommendation.at[count, 'ingredients'] = df_recipes['ingredients'][i]  # Use original ingredients
-        recommendation.at[count, 'url'] = df_recipes['recipe_urls'][i]
-        recommendation.at[count, 'score'] = "{:.3f}".format(float(scores[i]))
-        count += 1
-    return recommendation
+    top = sorted(range(min(len(scores), df_recipes.shape[0])), key=lambda i: scores[i], reverse=True)[:N]
+    return df_recipes.iloc[top]
 
 def RecSys(ingredients, cuisine, N=5):
     """
@@ -60,7 +42,12 @@ def RecSys(ingredients, cuisine, N=5):
     scores = list(cos_sim)
 
     # Filter top N recommendations for the specified cuisine
-    recommendations = get_recommendations(N, scores, cuisine)
+    df_recipes = pd.read_csv('store\df_recipes_parsed1.csv')
+
+    
+    df_recipes = df_recipes[df_recipes["cuisine"] == cuisine]
+
+    recommendations = get_recommendations(N, scores, cuisine,df_recipes)
     return recommendations
 
 
@@ -88,10 +75,21 @@ def missing_ingredients(input_ingredients, recommended_ingredients):
 if __name__ == "__main__":
     # test ingredients
     test_ingredients = "pasta, tomato, onion"
-    recs = RecSys(test_ingredients)
-    for i in range(len(recs)):
-        print(recs['recipe'][i])
-        print(recs['ingredients'][i])
-        print(recs['url'][i])
-        print('Missing Ingredients: ', missing_ingredients(test_ingredients, recs['ingredients'][i]))
-        print("\n")
+    cuisine = input("Enter the cuisine: ")
+    N= int(input("Enter the number of recommendations: "))
+    recs = RecSys(test_ingredients, cuisine, N)
+    print('Top 5 Recommendations for Italian Cuisine: ')
+    print(len(recs))
+    print()
+    for index, row in recs.iterrows():
+      recipe_name = row['recipe_name']
+      print(recipe_name)  # Replace with actual column name
+      url = row['recipe_urls']
+      print('Recipe URL: ')   
+      print(url)
+      ingredients = row['ingredients']
+      print('Ingredients: ')
+      print(ingredients)
+      missing_ingredients_list = missing_ingredients(test_ingredients, ingredients)
+      print('Missing Ingredients: ', missing_ingredients_list)
+      print()

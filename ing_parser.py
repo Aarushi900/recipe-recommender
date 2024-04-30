@@ -74,7 +74,7 @@ def ingredient_parser(ingreds):
 
 
 if __name__ == "__main__":
-    recipe_df = pd.read_csv('store/df_recipes.csv')
+    recipe_df = pd.read_csv('store\combined_df_recipes_with_cuisine.csv')
     recipe_df['ingredients_parsed'] = recipe_df['ingredients'].apply(lambda x: ingredient_parser(x))
     df = recipe_df[['recipe_name', 'ingredients_parsed', 'ingredients', 'recipe_urls']]
     df = recipe_df.dropna()
@@ -82,11 +82,11 @@ if __name__ == "__main__":
     # remove - Allrecipes.com from end of every recipe title 
     m = df.recipe_name.str.endswith('Recipe - Allrecipes.com')
     df['recipe_name'].loc[m] = df.recipe_name.loc[m].str[:-23]        
-    df.to_csv('store/df_recipes_parsed.csv', index=False)
+    df.to_csv('store/df_recipes_parsed_final.csv', index=False)
     
     print('done')
     # load in parsed recipe dataset 
-    df_recipes1 = pd.read_csv('store/df_recipes_parsed.csv')
+    df_recipes1 = pd.read_csv('store/df_recipes_parsed_final.csv')
     df_recipes1['ingredients_parsed'] = df_recipes1.ingredients_parsed.values.astype('U')
 
     # TF-IDF feature extractor 

@@ -1,74 +1,41 @@
-import google.generativeai as genai
-import os
 import pandas as pd
-from config import API_KEY
+import glob
 
-genai.configure(api_key=API_KEY)
-df = pd.read_csv('store/df_recipes.csv')
-safety_settings = [
-    {
-        "category": "HARM_CATEGORY_DANGEROUS",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE",
-    },
-]
+# Define the directory where CSV files are stored
+csv_directory = 'generation_csv/'
 
-model = genai.GenerativeModel('models/gemini-pro',safety_settings=safety_settings)
+# Find all CSV files in the directory
+csv_files = glob.glob(csv_directory + '*.csv')
 
-def predict_cuisine(recipe_name):
-    """Predicts the cuisine of a single recipe name using Generative AI.
+# Create an empty DataFrame to hold the combined data
+combined_df = pd.DataFrame()
 
-    Args:
-        recipe_name (str): The name of the recipe for which to predict cuisine.
+# Iterate over all CSV files
+for csv_file in csv_files:
+    # Read each CSV file into a DataFrame
+    df = pd.read_csv(csv_file)
+    
+    # Append the data from each DataFrame to the combined DataFrame
+    combined_df = combined_df._append(df, ignore_index=True)
 
-    Returns:
-        str: The predicted cuisine.
-    """
+# Specify the filename for the combined CSV file
+combined_filename = 'combined_df_recipes_with_cuisine.csv'
 
-    prompt = f"type of cuisine of {recipe_name} from given list( Mexican, Indian, Italian, American ,Japanese, Thai, French, Chinese, Unknown )...one word answer only"
-    response = model.generate_content(prompt)
-    return response.text.strip()  # Remove leading/trailing whitespace
+# Save the combined DataFrame to a single CSV file
+combined_df.to_csv(combined_filename, index=False)
 
-# Specify the starting index for predictions
-start_index = 0 # Replace with the desired starting index (e.g., 3 for starting from the 4th row)
+print(f"Combined CSV file saved as {combined_filename}")
+df = pd.read_csv('df_recipes_with_cuisine.csv')
+df = df.dropna()
+# Check for duplicates
+duplicates = df[df.duplicated()]
 
-# Optional: Specify a filename for the intermediate DataFrame
-output_filename = 'df_recipes_with_cuisine.csv'  # Replace with desired filename
+# Optionally, remove duplicate rows
+# df.drop_duplicates(inplace=True)
 
-predicted_cuisines = []
-batch_size = 50
-for start_index in range(1450, len(df), batch_size):
-    end_index = min(start_index + batch_size, len(df))
-    batch_df = df.iloc[start_index:end_index]
-    print(start_index)
-
-    # Predict cuisines for the batch
-    predicted_cuisines = []
-
-    for recipe_name in batch_df['recipe_name']:
-        predicted_cuisine = predict_cuisine(recipe_name)
-        predicted_cuisines.append(predicted_cuisine)
-
-    # Update the batch dataframe
-    batch_df.loc[:, 'cuisine'] = predicted_cuisines
-
-    # Save the batch dataframe (optional with incrementing filename)
-    if start_index % 50 == 0:
-        filename = f"{output_filename}_{start_index}.csv"
-        batch_df.to_csv(filename, index=False)
-        print(f"Saved intermediate results to {filename} (rows {start_index} to {end_index-1})")
+# Print duplicate rows if any
+if not duplicates.empty:
+    print("Duplicate rows found:")
+    print(duplicates)
+else:
+    print("No duplicate rows found.")

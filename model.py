@@ -10,7 +10,7 @@ from gensim.models import Word2Vec
 import config
 from ing_parser import ingredient_parser
 
-data = pd.read_csv('store/df_recipes_parsed.csv')
+data = pd.read_csv('store/df_recipes_parsed1.csv')
 data['parsed_new'] = data.ingredients.apply(ingredient_parser)
 data.head()
 # get corpus with the documents sorted in alphabetical order
@@ -67,7 +67,7 @@ words.sort()
 # for ingredient, similarity in similar_ingredients:
 #     print(f"- {ingredient}: {similarity}")
 # save model
-model_cbow.save('store/model_cbow.bin')
+model_cbow.save('store/model_cbow1.bin')
 
 # class MeanEmbeddingVectorizer(object):
 
@@ -112,7 +112,7 @@ model_cbow.save('store/model_cbow.bin')
 # 		"""
 # 		return np.vstack([self.word_average(sent) for sent in docs])
 	
-loaded_model = Word2Vec.load('store/model_cbow.bin')
+loaded_model = Word2Vec.load('store/model_cbow1.bin')
 if loaded_model:
     print("Successfully loaded model")
 
