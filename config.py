@@ -1,0 +1,5 @@
+TFIDF_ENCODING_PATH = "store/tfidf_encodings.pkl"
+TFIDF_MODEL_PATH = "store/tfidf.pkl"
+RECIPES_PATH = "store/df_recipes.csv"
+PARSED_PATH = "store/df_recipes_parsed.csv"
+API_KEY="AIzaSyBLvLtbgayHlSiBpnIKwfWyuU7U-TnFgS4"
