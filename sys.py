@@ -5,6 +5,7 @@ from ing_parser import ingredient_parser
 import pickle
 import config 
 import unidecode
+from Detector import detect_objects
 
 def get_recommendations(N, scores, cuisine,df_recipes):
     # order the scores with and filter to get the highest N scores
@@ -74,10 +75,16 @@ def missing_ingredients(input_ingredients, recommended_ingredients):
 
 if __name__ == "__main__":
     # test ingredients
-    test_ingredients = "capsicum"
+    image_path = "cap.jpeg"
+    detected_labels = detect_objects(image_path)
+
+    cuisines = ["Mexican", "Indian", "Italian", "American" ,"Japanese", "Thai", "French", "Chinese", "Unknown"]
+
+    print(cuisines)
+    #test_ingredients = "capsicum"
     cuisine = input("Enter the cuisine: ")
     N= int(input("Enter the number of recommendations: "))
-    recs = RecSys(test_ingredients, cuisine, N)
+    recs = RecSys(detected_labels, cuisine, N)
     print('Top 5 Recommendations for Italian Cuisine: ')
     print(len(recs))
     print()
@@ -90,6 +97,6 @@ if __name__ == "__main__":
       ingredients = row['ingredients']
       print('Ingredients: ')
       print(ingredients)
-      missing_ingredients_list = missing_ingredients(test_ingredients, ingredients)
+      missing_ingredients_list = missing_ingredients(detected_labels, ingredients)
       print('Missing Ingredients: ', missing_ingredients_list)
       print()
