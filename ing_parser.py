@@ -74,7 +74,7 @@ def ingredient_parser(ingreds):
 
 
 if __name__ == "__main__":
-    recipe_df = pd.read_csv('store\combined_df_recipes_with_cuisine.csv')
+    recipe_df = pd.read_csv('store/combined_df_recipes_with_cuisine.csv')
     recipe_df['ingredients_parsed'] = recipe_df['ingredients'].apply(lambda x: ingredient_parser(x))
     df = recipe_df[['recipe_name', 'ingredients_parsed', 'ingredients', 'recipe_urls']]
     df = recipe_df.dropna()

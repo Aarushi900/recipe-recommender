@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from ing_parser import ingredient_parser
 import pickle
 import config 
-import unidecode, ast
+import unidecode
 
 def get_recommendations(N, scores, cuisine,df_recipes):
     # order the scores with and filter to get the highest N scores
@@ -42,7 +42,7 @@ def RecSys(ingredients, cuisine, N=5):
     scores = list(cos_sim)
 
     # Filter top N recommendations for the specified cuisine
-    df_recipes = pd.read_csv('store\df_recipes_parsed1.csv')
+    df_recipes = pd.read_csv('store/df_recipes_parsed_final.csv')
 
     
     df_recipes = df_recipes[df_recipes["cuisine"] == cuisine]
@@ -74,7 +74,7 @@ def missing_ingredients(input_ingredients, recommended_ingredients):
 
 if __name__ == "__main__":
     # test ingredients
-    test_ingredients = "pasta, tomato, onion"
+    test_ingredients = "capsicum"
     cuisine = input("Enter the cuisine: ")
     N= int(input("Enter the number of recommendations: "))
     recs = RecSys(test_ingredients, cuisine, N)
